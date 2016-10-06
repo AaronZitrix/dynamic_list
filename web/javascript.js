@@ -14,7 +14,7 @@ function init() {
     req.open("GET", "prepareData", true);
     req.onreadystatechange = initCompletion;
     req.send(null);
-    
+    alert("done");
 }
 
 function initCompletion() {
