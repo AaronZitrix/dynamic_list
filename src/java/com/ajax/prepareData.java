@@ -7,6 +7,7 @@ package com.ajax;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.json.*;
 
 /**
  *
@@ -62,48 +64,56 @@ public class prepareData extends HttpServlet {
         
         PrintWriter out = response.getWriter();
 
-        String connectionURL = "jdbc:derby://localhost:1527/dlist";
+        //String connectionURL = "jdbc:derby://localhost:1527/dlist [ on APP]";
+        String connectionURL = "jdbc:mysql://195.46.191.142:3306/mysql?zeroDateTimeBehavior=convertToNull";
         Connection connection = null;
         ResultSet rs;
+        int itemsPerPage = 10;
 
         response.setContentType("text/html");
         List dataList = new ArrayList();
 
         try {
-
+            //Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(connectionURL, "", "");
+            connection = DriverManager.getConnection(connectionURL, "AaronZ", "zx8471p");
             Statement s = connection.createStatement();
             String sql;
             
             // Создаем таблицу с данными в БД
             
-            try {
+            /*try {
                 sql = "CREATE TABLE MAINTABLE (ID INTEGER NOT NULL primary key)";
                 s.executeUpdate(sql);
-                /*sql = "";
+                //sql = "";
                 for (int i = 1; i <= 1000; i++) {
-                    sql += "INSERT INTO MAINTABLE VALUES (" + i + ");";
+                    //sql += "INSERT INTO MAINTABLE VALUES (" + i + ");";
+                    s.executeUpdate("INSERT INTO MAINTABLE VALUES (" + i + ")");
                 }
-                s.executeUpdate(sql);*/
-                s.executeUpdate("INSERT INTO MAINTABLE VALUES (1)");
+                //s.executeUpdate(sql);
+                //s.executeUpdate("INSERT INTO MAINTABLE VALUES (1)");
                 
             } catch(SQLException e) {
-                
-            }
+                String a = "";
+            }*/
             
             // Выбираем данные из БД
-            /*sql = "SELECT ID FROM APP.MAINTABLE";
+            sql = "SELECT ID FROM MAINTABLE LIMIT " + itemsPerPage;
             s.executeQuery(sql);
             rs = s.getResultSet();
-
+            JsonArrayBuilder jArrayBuilder = Json.createArrayBuilder();
             while (rs.next()) {
-                // Сохраняем всё в список
-                dataList.add(rs.getInt("id"));
-                dataList.add(rs.getString("message"));
+                jArrayBuilder.add(rs.getInt("id"));
             }
-
-            rs.close();*/
+            String json_value = Json.createObjectBuilder()
+                .add("items", jArrayBuilder)
+                .build().toString();
+            
+            response.setContentType("application/json");
+            response.setHeader("Cache-Control", "no-cache");
+            response.getWriter().write(json_value);
+            
+            rs.close();
             s.close();
             
         } catch (Exception e) {
