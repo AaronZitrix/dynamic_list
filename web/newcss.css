@@ -1,0 +1,9 @@
+
+#dynamicTable {
+    /*border: 1px black solid;*/
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px black solid;
+}
