@@ -36,7 +36,7 @@ function initCompletion() {
 function addContentItem(item) {
     row = document.createElement("tr");
     cell = document.createElement("td");
-    cell.height = 165;
+    cell.height = 163;
     cell.align = "center";
     row.appendChild(cell);
     dynamicTable.appendChild(row);
