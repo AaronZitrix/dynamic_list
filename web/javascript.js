@@ -1,25 +1,46 @@
 
 var req;
+var dynamicTable;
 
 function init() {
     
-    var dynamicTable = document.getElementById("dynamicTable");
+    dynamicTable = document.getElementById("dynamicTable");
     dynamicTable.style.visibility = "hidden";
     
     var infoBox = document.getElementById("infoBox");
-    infoBox.innerText = "Data preparation...";
+    infoBox.innerText = "loading...";
     infoBox.style.visibility = "visible";
     
     req = initRequest();
     req.open("GET", "prepareData", true);
     req.onreadystatechange = initCompletion;
     req.send(null);
-    alert("done");
+    
 }
 
 function initCompletion() {
     if ((req.readyState != 4) || (req.status != 200)) return;
-    
+    //clearTable();
+    infoBox.innerText = req.responseText;
+    /*for (i = 1; i > 10; i++) {
+        addContentItem();
+    }*/
+    /*dynamicTable.style.visibility = "visible";
+    infoBox.style.visibility = "hidden";*/
+}
+
+function addContentItem() {
+    row = document.createElement("tr");
+    cell = document.createElement("td");
+    row.appendChild(cell);
+    dynamicTable.appendChild(row);
+}
+
+function clearTable() {
+    if (dynamicTable.getElementsByTagName("tr").length = 0) return;
+    for (i = dynamicTable.childNodes.length - 1; i >= 0 ; i--) {
+        dynamicTable.removeChild(dynamicTable.childNodes[i]);
+    }
 }
 
 function initRequest() {
