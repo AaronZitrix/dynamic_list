@@ -21,7 +21,7 @@ function init() {
 function initCompletion() {
     if ((req.readyState != 4) || (req.status != 200)) return;
     //clearTable();
-    infoBox.innerText = req.responseText;
+    var items = JSON.parse(req.responseText).items;
     /*for (i = 1; i > 10; i++) {
         addContentItem();
     }*/
