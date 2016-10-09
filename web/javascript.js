@@ -1,6 +1,10 @@
 
 var req, dynamicTable, infoBox;
 
+window.onscroll = function() {
+    alert(123);
+}
+
 function init() {
     
     dynamicTable = document.getElementById("dynamicTable");
