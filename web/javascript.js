@@ -42,6 +42,7 @@ function loadPage(pageNumber) {
     infoBox.style.display = "";
 
     var url = "prepareData?pageNumber=" + pageNumber;
+    //history.pushState('', '', url); // меняем url в браузере, чтобы можно было добавить в закладки
 
     req = initRequest();
     req.open("GET", url, true);
