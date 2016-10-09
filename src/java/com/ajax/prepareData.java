@@ -62,14 +62,17 @@ public class prepareData extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        PrintWriter out = response.getWriter();
+        //PrintWriter out = response.getWriter();
 
+        int pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
+        int itemsPerPage = 10;
+        int startPosition = (pageNumber - 1) * itemsPerPage;
+        
         //String connectionURL = "jdbc:derby://localhost:1527/dlist [ on APP]";
         String connectionURL = "jdbc:mysql://195.46.191.142:3306/mysql?zeroDateTimeBehavior=convertToNull";
         Connection connection = null;
         ResultSet rs;
-        int itemsPerPage = 10;
-
+        
         response.setContentType("text/html");
         List dataList = new ArrayList();
 
@@ -98,7 +101,8 @@ public class prepareData extends HttpServlet {
             }*/
             
             // Выбираем данные из БД
-            sql = "SELECT ID FROM MAINTABLE LIMIT " + itemsPerPage;
+            
+            sql = "SELECT ID FROM MAINTABLE LIMIT " + startPosition + "," + itemsPerPage;
             s.executeQuery(sql);
             rs = s.getResultSet();
             JsonArrayBuilder jArrayBuilder = Json.createArrayBuilder();
