@@ -73,8 +73,8 @@ public class prepareData extends HttpServlet {
         Connection connection = null;
         ResultSet rs;
         
-        response.setContentType("text/html");
-        List dataList = new ArrayList();
+        //response.setContentType("text/html");
+        //List dataList = new ArrayList();
 
         try {
             //Class.forName("org.apache.derby.jdbc.EmbeddedDriver");

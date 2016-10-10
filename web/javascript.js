@@ -1,26 +1,45 @@
 
-var req, dynamicTable, infoBox, itemsPerPage = 10;
+var req;
+var dynamicTable, infoBoxTop, infoBoxBottom;
+var itemsPerPage = 10, numberOfPages = 100;
+var loadPageTopAllowed = true, loadPageBottomAllowed = true;
 
 function init() {
 
     dynamicTable = document.getElementById("dynamicTable");
-    infoBox = document.getElementById("infoBox");
+    infoBoxTop = document.getElementById("infoBoxTop");
+    infoBoxBottom = document.getElementById("infoBoxBottom");
 
-    loadPage(1);
+    loadPageBottom(10);
 
     window.onscroll = windowOnScroll;
-
+    
 }
 
 function windowOnScroll() {
-    var lastItem = dynamicTable.lastChild;
-    if (lastItem == null)
-        return;
+    
+    if (loadPageTopAllowed == true) {
+        var firstItem = dynamicTable.firstChild;
+        if (firstItem && isVisible(firstItem)) {
+            var prevPageNumber = Math.floor(firstItem.id.split("_")[1] / itemsPerPage);
+            if (prevPageNumber >= 1) {
+                infoBoxTop.innerText = "loading...";
+                infoBoxTop.style.display = "";
+                loadPageTop(prevPageNumber);
+            }
+        }
+    }
 
-    if (isVisible(lastItem)) {
-        var nextPageNumber = lastItem.id.split("_")[1] / itemsPerPage + 1;
-        if (Number.isInteger(nextPageNumber))
-            loadPage(nextPageNumber);
+    if (loadPageBottomAllowed == true) {
+        var lastItem = dynamicTable.lastChild;
+        if (lastItem && isVisible(lastItem)) {
+            var nextPageNumber = Math.floor(lastItem.id.split("_")[1] / itemsPerPage) + 1;
+            if (nextPageNumber <= numberOfPages) {
+                infoBoxBottom.innerText = "loading...";
+                infoBoxBottom.style.display = "";
+                loadPageBottom(nextPageNumber);
+            }
+        }
     }
 }
 
@@ -36,44 +55,82 @@ function isVisible(elem, topVisible, bottomVisible) {
 
 }
 
-function loadPage(pageNumber) {
+function loadPageTop(pageNumber) {
 
-    infoBox.innerText = "loading...";
-    infoBox.style.display = "";
+    loadPageTopAllowed = false;
 
-    var url = "prepareData?pageNumber=" + pageNumber;
+    var url = "prepareData?pageNumber=" + pageNumber + "&r=" + Math.random();
     //history.pushState('', '', url); // меняем url в браузере, чтобы можно было добавить в закладки
 
     req = initRequest();
     req.open("GET", url, true);
-    req.onreadystatechange = loadPageCompletion;
+    req.onreadystatechange = loadPageTopCompletion;
     req.send(null);
 
 }
 
-function loadPageCompletion() {
+function loadPageTopCompletion() {
 
-    if ((req.readyState != 4) || (req.status != 200))
+    if ((req.readyState != 4) || (req.status != 200)) {
         return;
-
-    var items = JSON.parse(req.responseText).items;
-    for (i = 0; i < items.length; i++) {
-        addContentItem(items[i]);
     }
 
-    infoBox.style.display = "none";
+    var pagePositionTop = window.pageYOffset || document.documentElement.scrollTop;
+    var items = JSON.parse(req.responseText).items;
+    var generalOffset = 0;
+    for (var i = items.length - 1; i >= 0; i--) {
+        //if (document.getElementById("Item_" + items[i]) != null) continue;
+        var row = createContentItem(items[i]);
+        dynamicTable.insertBefore(row, dynamicTable.firstChild);
+        generalOffset += row.offsetHeight;
+    }
+    window.scrollTo(0, generalOffset + pagePositionTop - infoBoxTop.offsetHeight);
+    infoBoxTop.style.display = "none";
+    loadPageTopAllowed = true;
+    
+    //window.location = "#item_91";
+}
+
+function loadPageBottom(pageNumber) {
+
+    loadPageBottomAllowed = false;
+
+    var url = "prepareData?pageNumber=" + pageNumber + "&r=" + Math.random();
+    //history.pushState('', '', url); // меняем url в браузере, чтобы можно было добавить в закладки
+
+    req = initRequest();
+    req.open("GET", url, true);
+    req.onreadystatechange = loadPageBottomCompletion;
+    req.send(null);
 
 }
 
-function addContentItem(item) {
-    row = document.createElement("tr");
+function loadPageBottomCompletion() {
+
+    if ((req.readyState != 4) || (req.status != 200)) {
+        return;
+    }
+
+    var items = JSON.parse(req.responseText).items;
+    for (var i = 0; i < items.length; i++) {
+        //if (document.getElementById("Item_" + items[i]) != null) continue;
+        var row = createContentItem(items[i]);
+        dynamicTable.appendChild(row);
+    }
+
+    infoBoxTop.style.display = "none";
+    loadPageBottomAllowed = true;
+}
+
+function createContentItem(item) {
+    var row = document.createElement("tr");
     row.id = "item_" + item;
-    cell = document.createElement("td");
+    var cell = document.createElement("td");
     cell.height = 163;
     cell.align = "center";
-    row.appendChild(cell);
-    dynamicTable.appendChild(row);
     cell.innerHTML = item;
+    row.appendChild(cell);
+    return row;
 }
 
 function clearTable() {
