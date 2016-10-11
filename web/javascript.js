@@ -11,6 +11,7 @@ function init() {
     infoBoxBottom = document.getElementById("infoBoxBottom");
 
     loadPageBottom(10);
+    //loadPageTop(10);
 
     window.onscroll = windowOnScroll;
     
@@ -118,7 +119,7 @@ function loadPageBottomCompletion() {
         dynamicTable.appendChild(row);
     }
 
-    infoBoxTop.style.display = "none";
+    infoBoxBottom.style.display = "none";
     loadPageBottomAllowed = true;
 }
 
